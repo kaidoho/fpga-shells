@@ -90,6 +90,26 @@ class JTAGDebugArtyOverlay(val shell: Arty100TShell, val name: String, params: J
   } }
 }
 
+class SPIFlashArtyOverlay(val shell: Arty100TShell, val name: String, params: SPIFlashOverlayParams)
+  extends SPIFlashXilinxOverlay(params)
+{
+ 
+  shell { InModuleBody { 
+    val packagePinsWithPackageIOs = Seq(("L16", IOPin(io.qspi_sck)),
+      ("L13", IOPin(io.qspi_cs)),
+      ("K17", IOPin(io.qspi_dq_0)),
+      ("K18", IOPin(io.qspi_dq_1)),
+      ("L14", IOPin(io.qspi_dq_2)),
+      ("M14", IOPin(io.qspi_dq_3)))
+
+    packagePinsWithPackageIOs foreach { case (pin, io) => {
+      shell.xdc.addPackagePin(io, pin)
+      shell.xdc.addIOStandard(io, "LVCMOS33")
+      shell.xdc.addIOB(io)
+    } }
+  } }
+}
+
 case object ArtyDDRSize extends Field[BigInt](0x10000000L * 1) // 256 MB
 class DDRArtyOverlay(val shell: Arty100TShell, val name: String, params: DDROverlayParams)
   extends DDROverlay[XilinxArty100TMIGPads](params)
@@ -149,6 +169,7 @@ class Arty100TShell()(implicit p: Parameters) extends Series7Shell
   val uart      = Overlay(UARTOverlayKey)      (new UARTArtyOverlay       (_, _, _))
   val sdio      = Overlay(SDIOOverlayKey)      (new SDIOArtyOverlay       (_, _, _))
   val jtag      = Overlay(JTAGDebugOverlayKey) (new JTAGDebugArtyOverlay  (_, _, _))
+  val spi_flash = Overlay(SPIFlashOverlayKey)  (new SPIFlashArtyOverlay   (_, _, _))
 
   val topDesign = LazyModule(p(DesignKey)(designParameters))
 
