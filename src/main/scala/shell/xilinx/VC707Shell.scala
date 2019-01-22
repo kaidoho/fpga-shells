@@ -482,7 +482,7 @@ abstract class VC707Shell(implicit val p: Parameters) extends RawModule {
   // Clock Generator
   //-----------------------------------------------------------------------
 
-  //25MHz and multiples
+  //87.5 MHz and multiples - CHANGED for almond spec run at 87.5 MHz, tlclk at 43.75
   val vc707_sys_clock_mmcm0 = Module(new Series7MMCM(PLLParameters(
     "vc707_sys_clock_mmcm2",
     PLLInClockParameters(200, 50), 
@@ -490,15 +490,13 @@ abstract class VC707Shell(implicit val p: Parameters) extends RawModule {
       PLLOutClockParameters(12.5),
       PLLOutClockParameters(25),
       PLLOutClockParameters(37.5),
-      PLLOutClockParameters(50),
-      PLLOutClockParameters(100),
-      PLLOutClockParameters(150.00),
-      PLLOutClockParameters(100, 180)))))
+      PLLOutClockParameters(43.75),
+      PLLOutClockParameters(87.5)))))
   
   vc707_sys_clock_mmcm0.io.clk_in1 := sys_clock
   vc707_sys_clock_mmcm0.io.reset   := reset
   val vc707_sys_clock_mmcm0_locked = vc707_sys_clock_mmcm0.io.locked
-  val Seq(clk12_5, clk25, clk37_5, clk50, clk100, clk150, clk100_180) = vc707_sys_clock_mmcm0.getClocks
+  val Seq(clk12_5, clk25, clk37_5, clk43_75, clk87_5) = vc707_sys_clock_mmcm0.getClocks
 
   //65MHz and multiples
   //val vc707_sys_clock_mmcm1 = Module(new vc707_sys_clock_mmcm1)
