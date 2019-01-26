@@ -78,12 +78,12 @@ abstract class ArtyShellS7(implicit val p: Parameters) extends RawModule {
   val ja_7         = IO(Analog(1.W))
 
   // JD (used for JTAG connection)
-  val jd_0         = IO(Analog(1.W))  // TDO
-  val jd_1         = IO(Analog(1.W))  // TRST_n
-  val jd_2         = IO(Analog(1.W))  // TCK
-  val jd_4         = IO(Analog(1.W))  // TDI
-  val jd_5         = IO(Analog(1.W))  // TMS
-  val jd_6         = IO(Analog(1.W))  // SRST_n
+  val jb_0         = IO(Analog(1.W))  // TDO
+  val jb_1         = IO(Analog(1.W))  // TRST_n
+  val jb_2         = IO(Analog(1.W))  // SRST_n
+  val jb_4         = IO(Analog(1.W))  // TDI
+  val jb_5         = IO(Analog(1.W))  // TMS
+  val jb_6         = IO(Analog(1.W))  // TCK
 
   // ChipKit Digital I/O Pins
   val ck_io        = IO(Vec(20, Analog(1.W)))
@@ -190,18 +190,18 @@ abstract class ArtyShellS7(implicit val p: Parameters) extends RawModule {
     // JTAG IOBUFs
     //-------------------------------------------------------------------
 
-    dut_jtag_TCK  := IBUFG(IOBUF(jd_2).asClock)
+    dut_jtag_TCK  := IBUFG(IOBUF(jb_6).asClock)
 
-    dut_jtag_TMS  := IOBUF(jd_5)
-    PULLUP(jd_5)
+    dut_jtag_TMS  := IOBUF(jb_5)
+    PULLUP(jb_5)
 
-    dut_jtag_TDI  := IOBUF(jd_4)
-    PULLUP(jd_4)
+    dut_jtag_TDI  := IOBUF(jb_4)
+    PULLUP(jb_4)
 
-    IOBUF(jd_0, dut_jtag_TDO)
+    IOBUF(jb_0, dut_jtag_TDO)
 
-    SRST_n := IOBUF(jd_6)
-    PULLUP(jd_6)
+    SRST_n := IOBUF(jb_2)
+    PULLUP(jb_2)
 
     //-------------------------------------------------------------------
     // JTAG PINS
