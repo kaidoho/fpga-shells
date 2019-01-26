@@ -86,7 +86,7 @@ abstract class ArtyShellS7(implicit val p: Parameters) extends RawModule {
   val jb_6         = IO(Analog(1.W))  // TCK
 
   // ChipKit Digital I/O Pins
-  val ck_io        = IO(Vec(20, Analog(1.W)))
+  val ck_io        = IO(Vec(16, Analog(1.W)))
 
   // ChipKit SPI
   val ck_miso      = IO(Analog(1.W))
