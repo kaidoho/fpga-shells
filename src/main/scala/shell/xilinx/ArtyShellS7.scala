@@ -14,30 +14,11 @@ import sifive.blocks.devices.spi._
 import sifive.blocks.devices.uart._
 import sifive.blocks.devices.pinctrl.{BasePin}
 
-import sifive.fpgashells.devices.xilinx.xilinxartys7mig._
 import sifive.fpgashells.ip.xilinx.{IBUFG, IOBUF, PULLUP, mmcm, reset_sys, PowerOnResetFPGAOnly}
 
 //-------------------------------------------------------------------------
 // ArtyShellS7
 //-------------------------------------------------------------------------
-
-trait HasDDR3 { this: ArtyShellS7 =>
-  
-  require(!p.lift(MemoryXilinxDDRKey).isEmpty)
-  val ddr = IO(new XilinxArtyS7MIGPads(p(MemoryXilinxDDRKey)))
-  
-  def connectMIG(dut: HasMemoryXilinxArtyS7MIGModuleImp): Unit = {
-    // Clock & Reset
-    dut.xilinxartys7mig.sys_clk_i := mig_clk_in
-    mig_clock                    := dut.xilinxartys7mig.ui_clk
-    mig_sys_reset                := dut.xilinxartys7mig.ui_clk_sync_rst
-    mig_mmcm_locked              := dut.xilinxartys7mig.mmcm_locked
-    dut.xilinxartys7mig.aresetn   := mig_resetn
-    dut.xilinxartys7mig.sys_rst   := mig_sys_reset_in
-
-    ddr <> dut.xilinxartys7mig
-  }
-}
 
 abstract class ArtyShellS7(implicit val p: Parameters) extends RawModule {
 
@@ -139,13 +120,6 @@ abstract class ArtyShellS7(implicit val p: Parameters) extends RawModule {
   val dut_jtag_reset = Wire(Bool())
   val dut_ndreset    = Wire(Bool())
 
-  val mig_clock       = Wire(Clock())
-  val mig_sys_reset_in = Wire(Bool())
-  val mig_reset       = Wire(Bool())
-  val mig_resetn      = Wire(Bool())
-  val mig_mmcm_locked = Wire(Bool())
-  val mig_sys_reset   = Wire(Bool())
-
   //-----------------------------------------------------------------------
   // Clock Generator
   //-----------------------------------------------------------------------
@@ -178,17 +152,6 @@ abstract class ArtyShellS7(implicit val p: Parameters) extends RawModule {
   reset_periph                     := ip_reset_sys.io.peripheral_reset
   reset_intcon_n                   := ip_reset_sys.io.interconnect_aresetn
   reset_periph_n                   := ip_reset_sys.io.peripheral_aresetn
-
-  // mig reset
-  val mig_reset_sys = Module(new reset_sys())
-  
-  mig_reset_sys.io.slowest_sync_clk := mig_clock
-  mig_reset_sys.io.ext_reset_in     := mig_sys_reset
-  mig_reset_sys.io.dcm_locked       := mig_mmcm_locked
-  
-  mig_sys_reset_in                  := ck_rst & SRST_n
-  mig_resetn                        := mig_reset_sys.io.peripheral_aresetn
-  mig_clk_in                        := CLK100MHZ
 
   //-----------------------------------------------------------------------
   // SPI Flash
